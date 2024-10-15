@@ -3,7 +3,7 @@ const router= express.Router();
 const Post = import('../Databases/Post.mjs');
 const User = import('../Databases/User.mjs');
 
-//Get all posts
+//Show posts
 router.get('/', async (req, res) => {
     const posts = await Post.find().populate('author');
     res.render('posts/index', { posts });
@@ -11,8 +11,19 @@ router.get('/', async (req, res) => {
 
 //Form to create new posts
 router.get('/new', async (req, res) => {
-    const users = (await User).find();
-    res.render('posts/new', { users });
+    res.render('posts/new');
+});
+
+
+router.post('/', async (req,res) => {
+    try {
+        const post = new Post(req.body);
+        await post.save();
+        res.redirect('/posts');
+    } catch (err) {
+        console.log(err);
+        res.redirect('/posts/new');
+    }
 });
 
 //Show individual post
@@ -29,14 +40,24 @@ router.get('/:id/edit', async (req, res) => {
 
 //Update posts
 router.put('/:id', async (req, res) => {
-    await Post.findByIdAndUpdate(req.params.id, req.body);
+    try {
+        await Post.findByIdAndUpdate(req.params.id, req.body);
     res.redirect(`/posts/${req.params.id}`);
+    } catch (err) {
+        console.log(err);
+        res.redirect(`/posts/${req.params.id}/edit`);
+    }
 });
 
 //Delete posts
 router.delete('/:id', async (req, res) => {
-    await Post.findByIdAndDelete(req.params.id);
+    try {
+        await Post.findByIdAndDelete(req.params.id);
     res.redirect('/posts');
+    } catch (err) {
+        console.log(err);
+        res.redirect('/posts');
+    }
 });
 
 export default router;
