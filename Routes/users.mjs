@@ -1,6 +1,6 @@
 const express = import('express');
 const router = express.Router();
-const User = require('../Databases/User.mjs')
+const User = import('../Databases/User.mjs')
 
 //Get all users
 router.get('/', async (req,res) => {
@@ -20,4 +20,4 @@ router.post('/', async (req, res) => {
     res.redirect('/users');
 });
 
-module.exports = router;
+export default router;
