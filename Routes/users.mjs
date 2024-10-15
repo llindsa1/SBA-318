@@ -2,22 +2,33 @@ const express = import('express');
 const router = express.Router();
 const User = import('../Databases/User.mjs')
 
-//Get all users
-router.get('/', async (req,res) => {
-    const users = await User.find();
-    res.render('users/index', { users });
+//Registration
+router.get('/register', (req,res) => {
+    res.render('users/register');
+});
+router.post('/register', async (req,res) => {
+    try {
+        const user = new User(req.body);
+        await user.save();
+        res.redirect('/users/login');
+    } catch (err) {
+        console.log(err);
+        res.redirect('/users/register');
+    }
 });
 
-//Create new user form
-router.get('/new', (req, res) => {
-    res.render('users/new');
+//Login
+router.get('/login', (req, res) => {
+    res.render('users/login');
 });
 
-//Create new user
-router.post('/', async (req, res) => {
-    const user = new User(req.body);
-    await user.save();
-    res.redirect('/users');
+router.post('/login', async (req, res) => {
+    const user = await User.findOne ({username: req.body.username});
+  if (user && user.password === req.body.password) {
+    res.redirect('/posts');
+  } else {
+    res.redirect('/users/login');
+  }
 });
 
 export default router;
